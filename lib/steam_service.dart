@@ -98,12 +98,7 @@ class SteamService {
           'name': 'Unknown',
           'genre': 'Unknown',
           'description': 'No description available',
-          'release_date': 'Unknown',
-          'rating': 'Unknown',
           'tags': [],
-          'price': 'Unknown',
-          'developer': 'Unknown',
-          'publisher': 'Unknown',
         };
       }
       return {
@@ -112,34 +107,18 @@ class SteamService {
             ? gameData['genres'][0]['description']
             : 'Unknown',
         'description': gameData['short_description'],
-        'release_date': gameData['release_date']?['date'] ?? 'Unknown',
-        'rating': gameData['metacritic']?['score']?.toString() ?? 'No rating',
         'tags': gameData['categories'] != null
             ? gameData['categories']
                 .map<String>((category) => category['description'].toString())
                 .toList()
             : <String>[], // 確保回傳的是 List<String>
-        'price': gameData['price_overview']?['final_formatted'] ?? 'Free',
-        'developer':
-            gameData['developers'] != null && gameData['developers'].isNotEmpty
-                ? gameData['developers'][0]
-                : 'Unknown',
-        'publisher':
-            gameData['publishers'] != null && gameData['publishers'].isNotEmpty
-                ? gameData['publishers'][0]
-                : 'Unknown',
       };
     } else {
       return {
         'name': 'Unknown',
         'genre': 'Unknown',
         'description': 'No description available',
-        'release_date': 'Unknown',
-        'rating': 'Unknown',
         'tags': [],
-        'price': 'Unknown',
-        'developer': 'Unknown',
-        'publisher': 'Unknown',
       };
     }
   }
@@ -189,39 +168,6 @@ class SteamService {
           .toList();
     } else {
       return [];
-    }
-  }
-
-  Future<List<Map<String, String>>> fetchPublishedFileDetails(
-      List<String> fileIds) async {
-    final response = await http.post(
-      Uri.parse(
-          'https://api.steampowered.com/IPublishedFileService/GetDetails/v1/'),
-      body: json.encode({
-        'key': apiKey,
-        'itemcount': fileIds.length,
-        'publishedfileids': fileIds,
-      }),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final files = data['response']['publishedfiledetails'] as List?;
-      if (files == null) {
-        return [];
-      }
-
-      return files
-          .map<Map<String, String>>((file) => {
-                'title': file['title'],
-                'description': file['description'],
-                'file_url': file['file_url'],
-                'preview_url': file['preview_url'],
-              })
-          .toList();
-    } else {
-      throw Exception('Failed to load published file details');
     }
   }
 
